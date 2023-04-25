@@ -1,0 +1,48 @@
+@charset "utf-8";
+
+table thead tr td {
+    text-align: center;
+}
+
+table tbody tr td {
+    text-align: right;
+}
+
+td {
+    width: 4rem;
+}
+
+table {
+    margin: auto;
+    border-spacing: 0px;
+}
+
+table.info thead tr td {
+    border-bottom: rgba(0,0,0,0.3) solid 1px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+table.board thead tr td {
+    border-bottom: rgba(0,0,0,0.3) solid 1px;
+}
+
+table.board tbody tr td.price {
+    border-right: #000 solid 2px;
+    border-left: #000 solid 2px;
+}
+table.board tbody tr td {
+    border-bottom: rgba(0,0,0,0.3) solid 1px;
+}
+
+td.price {
+    text-align: center;
+}
+
+b.bid {
+    color: #039BE5;
+}
+
+b.ask {
+    color: #e53935;
+}
