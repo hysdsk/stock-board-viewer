@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+const config = useRuntimeConfig()
 
 interface Board {
     sell: number;
@@ -21,7 +22,7 @@ interface Tick {
 
 export default defineEventHandler(async (event: any) => {
     const query = getQuery(event);
-    const filename = `/mnt/c/Users/hysds/Documents/GitHub/algorithm-trade/testdata/${query.thatday}/${query.symbol}.json`;
+    const filename = `${config.datasourcePath}/${query.thatday}/${query.symbol}.json`;
     const content = await readFileSync(filename, "utf-8");
     const messages: any = []
     content.split(/\n/).forEach((line: string) => {
