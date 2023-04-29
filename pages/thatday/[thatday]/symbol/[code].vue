@@ -68,14 +68,11 @@
 
 <script setup>
   import { ref, computed, watch, onMounted } from '#imports';
-  import dayjs from 'dayjs';
   import Chart from 'chart.js/auto';
 
   const route = useRoute();
-  const { code } = route.params;
+  const { thatday, code } = route.params;
   const queryParams = route.query;
-
-  const thatday = queryParams.thatday == undefined ? dayjs().format("YYYYMMDD") : queryParams.thatday;
   const span = queryParams.span == undefined ? 1 : queryParams.span;
   
   const { data } = await useFetch("/api/symbol", {
@@ -90,9 +87,6 @@
   const volumeDiff = computed(() => {
     return data._value.ticks[progressTime.value].tradingVolume - data._value.ticks[progressTime.value-1].tradingVolume
   })
-  // watch(progressTime, (c, p) => {
-    
-  // })
 
   onMounted(() => {
     new Chart(document.getElementById("priceChart"), {
