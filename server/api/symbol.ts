@@ -23,7 +23,7 @@ interface Tick {
 export default defineEventHandler(async (event: any) => {
     const query = getQuery(event);
     const filename = `${config.datasourcePath}/${query.thatday}/${query.symbol}.json`;
-    const content = await readFileSync(filename, "utf-8");
+    const content = readFileSync(filename, "utf-8");
     const messages: any = []
     content.split(/\n/).forEach((line: string) => {
         try {

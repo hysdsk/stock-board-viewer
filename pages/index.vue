@@ -1,21 +1,16 @@
 <template>
-  <h1>Index</h1>
+  <h1>Records</h1>
   <ul>
-    <li v-for="a in arr">{{ a }}</li>
+    <li v-for="d in data.records">
+      {{ d.name }}
+      <ul>
+        <li v-for="s in d.files">
+          <NuxtLink :to="`/thatday/${d.name}/symbol/${s.name}`">{{ s.name }}</NuxtLink>
+        </li>
+      </ul>
+    </li>
   </ul>
 </template>
 <script setup>
-  import { readdir } from 'node:fs';
-  const arr = []
-  readdir("/mnt/c/Users/hysds/Documents/GitHub/algorithm-trade/testdata", (err, files) => {
-    // if (err) {
-    //   console.error(err);
-    //   return;
-    // }
-    for (const file of files) {
-      if (file.match(/[0-9]{8}/)) {
-        arr.push(file)
-      }
-    }
-  })
+  const { data } = await useFetch("/api/record");
 </script>
