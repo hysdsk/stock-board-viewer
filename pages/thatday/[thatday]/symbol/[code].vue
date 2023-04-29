@@ -97,7 +97,7 @@
           label: "価格",
           data: data._value.chart.prices,
           borderWidth: 0.5,
-          pointRadius: data._value.chart.volumes
+          pointRadius: data._value.chart.tValues
         }, {
           type: "line",
           label: "VWAP",
