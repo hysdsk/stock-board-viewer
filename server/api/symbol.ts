@@ -1,25 +1,6 @@
 import { readFileSync } from 'node:fs';
 const config = useRuntimeConfig()
 
-interface Board {
-    sell: number;
-    price: number;
-    buy: number;
-}
-
-interface Tick {
-    recievedTime: string;
-    currentPrice: number;
-    currentPriceStatus: string;
-    vwap: number;
-    boards: Board[];
-    sellAmount: number;
-    buyAmount: number;
-    tradingVolume: number;
-    overSellQty: number;
-    underBuyQty: number;
-}
-
 export default defineEventHandler(async (event: any) => {
     const query = getQuery(event);
     const filename = `${config.datasourcePath}/${query.thatday}/${query.symbol}.json`;
@@ -67,6 +48,7 @@ export default defineEventHandler(async (event: any) => {
             sellAmount: sellAmount,
             buyAmount: buyAmount,
             tradingVolume: msg.TradingVolume == null ? 0 : msg.TradingVolume,
+            tradingValue: msg.TradingValue == null ? 0 : msg.TradingValue,
             overSellQty: msg.OverSellQty,
             underBuyQty: msg.UnderBuyQty
         })
@@ -76,15 +58,47 @@ export default defineEventHandler(async (event: any) => {
         times: ticks.map(e => e.recievedTime),
         prices: ticks.map(e => e.currentPrice),
         vwaps: ticks.map(e => e.vwap),
-        volumes: ticks.map((v, i) => {
+        tValues: ticks.map((v, i) => {
             if (i == 0) {
-                return v.tradingVolume;
+                return adjust(v.tradingValue, ticks[ticks.length-1].tradingValue)
             } else {
-                const c = v.tradingVolume ? v.tradingVolume : 0;
-                const p = ticks[i-1].tradingVolume ? ticks[i-1].tradingVolume : 0;
-                return (c - p) * 0.0005;
+                const c = v.tradingValue ? v.tradingValue : 0;
+                const p = ticks[i-1].tradingValue ? ticks[i-1].tradingValue : 0;
+                return adjust((c - p), ticks[ticks.length-1].tradingValue)
             }
         })
     }
     return { ticks, chart };
 });
+
+interface Board {
+    sell: number;
+    price: number;
+    buy: number;
+}
+
+interface Tick {
+    recievedTime: string;
+    currentPrice: number;
+    currentPriceStatus: string;
+    vwap: number;
+    boards: Board[];
+    sellAmount: number;
+    buyAmount: number;
+    tradingVolume: number;
+    tradingValue: number;
+    overSellQty: number;
+    underBuyQty: number;
+}
+
+const adjust = (v: number, tradingValue: number) => {
+    if (tradingValue > 10**11) {
+        return v * 0.00000005;
+    } else if (tradingValue > 10**10) {
+        return v * 0.0000001;
+    } else if (tradingValue > 10**9) {
+        return v * 0.0000005;
+    } else {
+        return v * 0.000001;
+    }
+}
