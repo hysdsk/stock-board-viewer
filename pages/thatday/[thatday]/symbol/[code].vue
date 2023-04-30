@@ -2,7 +2,7 @@
   <div style="display: inline-block; width: 30%; text-align: center;">
     <h1>{{ data.symbolName }}</h1>
   </div>
-  <div style="display: inline-block; width: 70%;">
+  <div style="display: inline-block; width: 60%;">
     <table class="info" style="margin-left: 0%;">
       <thead>
         <tr>
@@ -26,6 +26,14 @@
         </tr>
       </tbody>
     </table>
+  </div>
+  <div style="display: inline-block; width: 10%;">
+    <ul>
+      <li><a :href="`${route.path}?span=1`">呼び値： 1円</a></li>
+      <li><a :href="`${route.path}?span=5`">呼び値： 5円</a></li>
+      <li><a :href="`${route.path}?span=10`">呼び値：10円</a></li>
+      <!-- <li><NuxtLink :to="{path: `/thatday/${thatday}/symbol/${code}`, query: {span:  5}}">呼び値： 5円</NuxtLink></li> -->
+    </ul>
   </div>
   <div>
     <div style="display: inline-block; width: 15%;">
