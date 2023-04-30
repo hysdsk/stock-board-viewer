@@ -12,6 +12,8 @@ export default defineEventHandler(async (event: any) => {
         } catch (e) {}
     })
 
+    const symbolName = messages[0].SymbolName;
+
     const ticks: Tick[] = []
     const span = Number(query.span)
     messages.forEach((msg: any) => {
@@ -68,7 +70,7 @@ export default defineEventHandler(async (event: any) => {
             }
         })
     }
-    return { ticks, chart };
+    return { symbolName, ticks, chart };
 });
 
 interface Board {
