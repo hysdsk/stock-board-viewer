@@ -1,26 +1,32 @@
-import { readdirSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 const config = useRuntimeConfig()
 
-interface File {
-    name: string
+interface Symbol {
+    code: string;
+    name: string;
 }
 
-interface Directory {
+interface Thatday {
     name: string
-    files: File[]
+    formated: string
+    symbols: Symbol[]
 }
 
 export default defineEventHandler(async (event: any) => {
-    const records: Directory[] = [];
+    const records: Thatday[] = [];
     const dirs = readdirSync(config.datasourcePath);
     for (const dir of dirs) {
       if (dir.match(/[0-9]{8}/)) {
-        const thatday: Directory = <Directory>{name: dir, files: []};
+        const formated = `${dir.substring(0,4)}年${dir.substring(4,6)}月${dir.substring(6,8)}日`
+        const thatday: Thatday = <Thatday>{name: dir, formated: formated, symbols: []};
         const files = readdirSync(`${config.datasourcePath}/${dir}`);
         files.forEach(file => {
             if (file.match(/\.json$/)) {
-                thatday.files.push(<File>{
-                    name: file.replace(/\.json$/, "")
+                const content = readFileSync(`${config.datasourcePath}/${dir}/${file}`, "utf-8");
+                const tick = JSON.parse(content.split(/\n/)[0]);
+                thatday.symbols.push(<Symbol>{
+                    code: file.replace(/\.json$/, ""),
+                    name: tick.SymbolName
                 })
             }
         })

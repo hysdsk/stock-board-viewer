@@ -1,6 +1,9 @@
 <template>
-  <div style="display: inline-block; width: 50%;">
-    <table class="info">
+  <div style="display: inline-block; width: 30%; text-align: center;">
+    <h1>{{ data.symbolName }}</h1>
+  </div>
+  <div style="display: inline-block; width: 70%;">
+    <table class="info" style="margin-left: 0%;">
       <thead>
         <tr>
           <td>時間</td>
@@ -23,9 +26,6 @@
         </tr>
       </tbody>
     </table>
-  </div>
-  <div style="display: inline-block; width: 50%;">
-    <!-- TODO: Form送信 -->
   </div>
   <div>
     <div style="display: inline-block; width: 15%;">
