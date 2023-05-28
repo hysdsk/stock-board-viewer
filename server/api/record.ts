@@ -1,4 +1,5 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, createReadStream } from 'node:fs';
+import * as readline from 'node:readline'
 const config = useRuntimeConfig()
 
 interface Symbol {
@@ -20,16 +21,26 @@ export default defineEventHandler(async (event: any) => {
         const formated = `${dir.substring(0,4)}年${dir.substring(4,6)}月${dir.substring(6,8)}日`
         const thatday: Thatday = <Thatday>{name: dir, formated: formated, symbols: []};
         const files = readdirSync(`${config.datasourcePath}/${dir}`);
-        files.forEach(file => {
+        for (const file of files) {
             if (file.match(/\.json$/)) {
-                const content = readFileSync(`${config.datasourcePath}/${dir}/${file}`, "utf-8");
-                const tick = JSON.parse(content.split(/\n/)[0]);
+                const stream = createReadStream(`${config.datasourcePath}/${dir}/${file}`, "utf-8");
+                const reader = readline.createInterface({ input: stream });
+                const p: Promise<any> = new Promise((resolve, reject) => {
+                    reader.once("line", (input) => {
+                        resolve(input);
+                        reader.close();
+                        stream.destroy();
+                    });
+                });
+                const tick = await p.then((result) => {
+                    return JSON.parse(result);
+                })
                 thatday.symbols.push(<Symbol>{
                     code: file.replace(/\.json$/, ""),
                     name: tick.SymbolName
                 })
             }
-        })
+        }
         records.push(thatday);
       }
     }

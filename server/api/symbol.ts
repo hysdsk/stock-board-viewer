@@ -18,8 +18,9 @@ export default defineEventHandler(async (event: any) => {
     const span = Number(query.span)
     messages.forEach((msg: any) => {
         const boards: Board[] = [];
-        const high = msg.CalcPrice + (16 * span);
-        const low = msg.CalcPrice - (16 * span);
+        const basePrice = msg.BidSign == "0101" && msg.AskSign == "0101" ? msg.CurrentPrice : msg.BidPrice;
+        const high = basePrice + (16 * span);
+        const low = basePrice - (16 * span);
         for (let i = high; i > low; i -= span) {
             boards.push(<Board>{
                 price: Number(i)
@@ -47,12 +48,28 @@ export default defineEventHandler(async (event: any) => {
             currentPriceStatus: msg.CurrentPriceChangeStatus,
             vwap: msg.VWAP,
             boards: boards,
-            sellAmount: sellAmount,
-            buyAmount: buyAmount,
+            sellAmount: sellAmount - msg.MarketOrderSellQty,
+            buyAmount: buyAmount - msg.MarketOrderBuyQty,
+            sellSpread: msg["Sell10"]["Price"] - msg["Sell1"]["Price"],
+            buySpread: msg["Buy1"]["Price"] - msg["Buy10"]["Price"],
             tradingVolume: msg.TradingVolume == null ? 0 : msg.TradingVolume,
             tradingValue: msg.TradingValue == null ? 0 : msg.TradingValue,
             overSellQty: msg.OverSellQty,
-            underBuyQty: msg.UnderBuyQty
+            underBuyQty: msg.UnderBuyQty,
+            marketOrderSellQty: msg.MarketOrderSellQty,
+            marketOrderBuyQty: msg.MarketOrderBuyQty,
+            changePreviousClosePer: (() => {
+                if (msg.ChangePreviousClosePer != null) {
+                    return msg.ChangePreviousClosePer
+                }
+                if (msg.PreviousClose <= msg.AskPrice) {
+                    return Math.floor((msg.AskPrice / msg.PreviousClose * 10000) - 10000) / 100
+                } else if (msg.PreviousClose >= msg.BidPrice) {
+                    return Math.floor((msg.BidPrice / msg.PreviousClose * 10000) - 10000) / 100
+                } else {
+                    return 0
+                }
+            })()
         })
     })
 
@@ -87,10 +104,15 @@ interface Tick {
     boards: Board[];
     sellAmount: number;
     buyAmount: number;
+    sellSpread: number;
+    buySpread: number;
     tradingVolume: number;
     tradingValue: number;
     overSellQty: number;
     underBuyQty: number;
+    marketOrderSellQty: number;
+    marketOrderBuyQty: number;
+    changePreviousClosePer: number;
 }
 
 const adjust = (v: number, tradingValue: number) => {

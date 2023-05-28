@@ -1,9 +1,9 @@
 <template>
-  <div style="display: inline-block; width: 30%; text-align: center;">
+  <div style="display: inline-block; width: 20%; text-align: center;">
     <h1>{{ data.symbolName }}</h1>
   </div>
-  <div style="display: inline-block; width: 60%;">
-    <table class="info" style="margin-left: 0%;">
+  <div style="display: inline-block; width: 70%;">
+    <table class="info" style="margin-left: 0%; width: 45%">
       <thead>
         <tr>
           <td>時間</td>
@@ -11,18 +11,22 @@
           <td>買い板</td>
           <td>出来高</td>
           <td>約定</td>
+          <td>前日比</td>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td nowrap>{{ tick.recievedTime }}</td>
-          <td v-if="tick.sellAmount > tick.buyAmount"><b class="bid">{{ tick.sellAmount }}</b></td>
-          <td v-else>{{ tick.sellAmount }}</td>
-          <td v-if="tick.sellAmount < tick.buyAmount"><b class="ask">{{ tick.buyAmount }}</b></td>
-          <td v-else>{{ tick.buyAmount }}</td>
+          <td v-if="tick.sellAmount > tick.buyAmount"><b class="bid">{{ tick.sellAmount }}（{{ tick.sellSpread }}）</b></td>
+          <td v-else>{{ tick.sellAmount }}（{{ tick.sellSpread }}）</td>
+          <td v-if="tick.sellAmount < tick.buyAmount"><b class="ask">{{ tick.buyAmount }}（{{ tick.buySpread}}）</b></td>
+          <td v-else>{{ tick.buyAmount }}（{{ tick.buySpread}}）</td>
           <td nowrap>{{ tick.tradingVolume }}</td>
           <td v-if="volumeDiff > 0" nowrap>+{{ volumeDiff }}</td>
           <td v-else></td>
+          <td v-if="tick.changePreviousClosePer > 0"><b class="ask">{{ tick.changePreviousClosePer }}%</b></td>
+          <td v-else-if="tick.changePreviousClosePer < 0"><b class="bid">{{ tick.changePreviousClosePer }}%</b></td>
+          <td v-else><b class="ask">{{ tick.changePreviousClosePer }}%</b></td>
         </tr>
       </tbody>
     </table>
@@ -46,6 +50,11 @@
           </tr>
         </thead>
         <tbody>
+          <tr>
+            <td>{{ tick.marketOrderSellQty }}</td>
+            <td class="price">成行</td>
+            <td>{{ tick.marketOrderBuyQty }}</td>
+          </tr>
           <tr>
             <td>{{ tick.overSellQty }}</td>
             <td class="price">Over</td>
